@@ -1,0 +1,14 @@
+.appContainer {
+  display: flex;
+  height: 100vh;
+  overflow: hidden;
+  background: var(--surface-primary);
+}
+
+.appContainer[data-dir="rtl"] {
+  flex-direction: row-reverse;
+}
+
+.appContainer[data-dir="ltr"] {
+  flex-direction: row;
+}

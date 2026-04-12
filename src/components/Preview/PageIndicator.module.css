@@ -1,0 +1,9 @@
+.indicator {
+  font-size: 0.8125rem;
+  font-family: var(--font-mono);
+  font-weight: 500;
+  opacity: 0.9;
+  white-space: nowrap;
+  min-width: 120px;
+  text-align: center;
+}
