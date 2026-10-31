@@ -66,6 +66,10 @@ export interface SoundSettings {
   type: SoundType;
 }
 
+export interface ExportSettings {
+  downloadButton: boolean;
+}
+
 export interface BookSettings {
   displayMode: DisplayMode;
   direction: Direction;
@@ -77,4 +81,5 @@ export interface BookSettings {
   binding: BindingSettings;
   size: SizeSettings;
   sound: SoundSettings;
+  exportOptions: ExportSettings;
 }

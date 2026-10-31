@@ -12,9 +12,11 @@ interface PreviewAreaProps {
   pdfData: PdfData;
   isProcessing: boolean;
   progress: ProcessingProgress | null;
+  onExport?: () => Promise<void>;
+  onDownloadPdf?: () => Promise<void>;
 }
 
-export default function PreviewArea({ pdfData, isProcessing, progress }: PreviewAreaProps) {
+export default function PreviewArea({ pdfData, isProcessing, progress, onExport, onDownloadPdf }: PreviewAreaProps) {
   const { t } = useTranslation();
   const { settings } = useBookSettings();
   const containerRef = useRef<HTMLDivElement>(null);
@@ -54,7 +56,7 @@ export default function PreviewArea({ pdfData, isProcessing, progress }: Preview
       )}
 
       {hasPages && !isProcessing && (
-        <FlipBook pdfData={pdfData} containerRef={containerRef} />
+        <FlipBook pdfData={pdfData} containerRef={containerRef} onExport={onExport} onDownloadPdf={onDownloadPdf} />
       )}
     </div>
   );

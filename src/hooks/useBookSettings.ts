@@ -13,6 +13,7 @@ type SettingsAction =
   | { type: 'SET_BINDING'; payload: Partial<BookSettings['binding']> }
   | { type: 'SET_SIZE'; payload: Partial<BookSettings['size']> }
   | { type: 'SET_SOUND'; payload: Partial<BookSettings['sound']> }
+  | { type: 'SET_EXPORT'; payload: Partial<BookSettings['exportOptions']> }
   | { type: 'RESET' };
 
 function settingsReducer(state: BookSettings, action: SettingsAction): BookSettings {
@@ -41,6 +42,8 @@ function settingsReducer(state: BookSettings, action: SettingsAction): BookSetti
       return { ...state, size: { ...state.size, ...action.payload } };
     case 'SET_SOUND':
       return { ...state, sound: { ...state.sound, ...action.payload } };
+    case 'SET_EXPORT':
+      return { ...state, exportOptions: { ...state.exportOptions, ...action.payload } };
     case 'RESET':
       return DEFAULT_SETTINGS;
     default:

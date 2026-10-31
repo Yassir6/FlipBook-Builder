@@ -4,6 +4,7 @@ import { I18nContext, translate, type TranslationKey } from './i18n';
 import { SettingsContext, useSettingsReducer } from './hooks/useBookSettings';
 import { usePdfProcessor } from './hooks/usePdfProcessor';
 import { exportAsHtml } from './services/exportService';
+import { downloadOriginalPdf } from './services/pdfExportService';
 import Sidebar from './components/Layout/Sidebar';
 import PreviewArea from './components/Layout/PreviewArea';
 import styles from './App.module.css';
@@ -39,8 +40,23 @@ export default function App() {
       settings.displayMode === 'spread'
         ? pdfProcessor.data.spreadPages
         : pdfProcessor.data.pages;
-    await exportAsHtml(settings, pages, pdfProcessor.data.textData);
+    await exportAsHtml(
+      settings,
+      pages,
+      pdfProcessor.data.textData,
+      pdfProcessor.data.originalPdfBytes,
+      pdfProcessor.data.originalFileName,
+    );
   }, [settings, pdfProcessor.data]);
+
+  const handleDownloadPdf = useCallback(async () => {
+    const bytes = pdfProcessor.data.originalPdfBytes;
+    if (!bytes) return;
+    const fileName =
+      pdfProcessor.data.originalFileName ||
+      `${settings.cover.title || 'flipbook'}.pdf`;
+    await downloadOriginalPdf(bytes, fileName);
+  }, [settings.cover.title, pdfProcessor.data.originalPdfBytes, pdfProcessor.data.originalFileName]);
 
   return (
     <I18nContext.Provider value={{ language, setLanguage, t, dir }}>
@@ -57,6 +73,8 @@ export default function App() {
             pdfData={pdfProcessor.data}
             isProcessing={pdfProcessor.isProcessing}
             progress={pdfProcessor.progress}
+            onExport={handleExport}
+            onDownloadPdf={handleDownloadPdf}
           />
         </div>
       </SettingsContext.Provider>

@@ -6,7 +6,9 @@ export function generateJS(
   pages: PageData[],
   textData: PageTextData[],
   pageFlipSource: string,
-  flipSoundBase64: string
+  flipSoundBase64: string,
+  originalPdfBase64: string,
+  pdfFileName: string
 ): string {
   const isRtl = settings.direction === 'rtl';
   const totalPages = pages.length;
@@ -47,6 +49,7 @@ export function generateJS(
   }
 
   const pageImages = JSON.stringify(displayPages.map((p) => p.imageData));
+  const safePdfFileName = (pdfFileName || 'flipbook.pdf').replace(/[\\/:*?"<>|]/g, '_');
 
   const labels = settings.language === 'ar'
     ? { page: 'صفحة', of: 'من', goTo: 'انتقل إلى صفحة' }
@@ -61,6 +64,8 @@ ${pageFlipSource}
   'use strict';
 
   var PAGES = ${pageImages};
+  var ORIGINAL_PDF_B64 = ${JSON.stringify(originalPdfBase64)};
+  var PDF_FILENAME = ${JSON.stringify(safePdfFileName)};
   var TOTAL_PAGES = ${totalPages};
   var IS_RTL = ${isRtl};
   var IS_SPREAD = ${isSpread};
@@ -363,6 +368,32 @@ ${pageFlipSource}
       document.documentElement.requestFullscreen();
     }
   });
+
+  // ===== Download the original PDF file (exact bytes of the uploaded file) =====
+  var btnDownload = document.getElementById('btn-download');
+  if (btnDownload && ORIGINAL_PDF_B64) {
+    btnDownload.addEventListener('click', function() {
+      try {
+        // Decode base64 into a byte array
+        var binary = atob(ORIGINAL_PDF_B64);
+        var len = binary.length;
+        var bytes = new Uint8Array(len);
+        for (var i = 0; i < len; i++) bytes[i] = binary.charCodeAt(i);
+        var blob = new Blob([bytes], { type: 'application/pdf' });
+        var url = URL.createObjectURL(blob);
+        var a = document.createElement('a');
+        a.href = url;
+        a.download = PDF_FILENAME;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        setTimeout(function() { URL.revokeObjectURL(url); }, 1000);
+      } catch (err) {
+        console.error('Download failed:', err);
+        alert('Failed to download: ' + (err && err.message ? err.message : err));
+      }
+    });
+  }
 
   // ===== Go to page (shared) =====
   function goToDisplayPage(displayPage) {

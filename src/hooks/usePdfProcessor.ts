@@ -13,6 +13,10 @@ export interface PdfData {
   textData: PageTextData[];
   thumbnails: string[];
   outline: OutlineItem[];
+  /** The exact bytes of the uploaded PDF — used for downloading the original file unchanged. */
+  originalPdfBytes: Uint8Array | null;
+  /** Original file name of the uploaded PDF. */
+  originalFileName: string | null;
 }
 
 export interface PdfProcessorState {
@@ -30,6 +34,8 @@ const initialData: PdfData = {
   textData: [],
   thumbnails: [],
   outline: [],
+  originalPdfBytes: null,
+  originalFileName: null,
 };
 
 export function usePdfProcessor() {
@@ -51,12 +57,15 @@ export function usePdfProcessor() {
     try {
       // Load PDF
       const arrayBuffer = await fileToArrayBuffer(file);
+      // Keep a snapshot of the original bytes — pdfjs will consume the buffer,
+      // so copy before passing in.
+      const originalPdfBytes = new Uint8Array(arrayBuffer.slice(0));
       const pdf = await loadPdf(arrayBuffer);
       const metadata = await getPdfMetadata(pdf);
 
       setState((prev) => ({
         ...prev,
-        data: { ...prev.data, pdf, metadata },
+        data: { ...prev.data, pdf, metadata, originalPdfBytes, originalFileName: file.name },
         progress: { phase: 'rendering', current: 0, total: metadata.pageCount, percent: 0 },
       }));
 
@@ -79,7 +88,17 @@ export function usePdfProcessor() {
       const spreadPages = await createSpreadPages(pages);
 
       setState({
-        data: { pdf, metadata, pages, spreadPages, textData, thumbnails, outline },
+        data: {
+          pdf,
+          metadata,
+          pages,
+          spreadPages,
+          textData,
+          thumbnails,
+          outline,
+          originalPdfBytes,
+          originalFileName: file.name,
+        },
         isProcessing: false,
         progress: { phase: 'done', current: metadata.pageCount, total: metadata.pageCount, percent: 100 },
         error: null,

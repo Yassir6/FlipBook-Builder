@@ -13,6 +13,7 @@ import CoverSettings from '../Sidebar/CoverSettings';
 import BindingSettings from '../Sidebar/BindingSettings';
 import SizeSettings from '../Sidebar/SizeSettings';
 import SoundSettings from '../Sidebar/SoundSettings';
+import ExportSettings from '../Sidebar/ExportSettings';
 import ExportButton from '../Sidebar/ExportButton';
 import styles from './Sidebar.module.css';
 
@@ -78,6 +79,10 @@ export default function Sidebar({ onFileSelect, isProcessing, progress, hasPages
 
             <SettingsSection title={t('sound')}>
               <SoundSettings />
+            </SettingsSection>
+
+            <SettingsSection title={t('exportOptions')}>
+              <ExportSettings />
             </SettingsSection>
           </>
         )}

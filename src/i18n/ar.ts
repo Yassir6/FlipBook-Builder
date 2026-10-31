@@ -116,6 +116,13 @@ const ar = {
   preview: 'معاينة',
   exportHtml: 'تصدير HTML',
   exporting: 'جاري التصدير...',
+  download: 'تحميل',
+  downloadFile: 'تحميل الملف',
+  downloadPdf: 'تحميل بصيغة PDF',
+  exportOptions: 'خيارات التصدير',
+  showDownloadButton: 'إظهار زر التحميل',
+  downloadButtonHelp: 'عرض زر لتحميل الكتاب PDF في الملف النهائي',
+  generatingPdf: 'جاري إنشاء ملف PDF...',
 
   // Navigation
   previousPage: 'الصفحة السابقة',

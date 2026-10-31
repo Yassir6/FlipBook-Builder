@@ -14,6 +14,8 @@ import styles from './FlipBook.module.css';
 interface FlipBookProps {
   pdfData: PdfData;
   containerRef: RefObject<HTMLDivElement | null>;
+  onExport?: () => Promise<void>;
+  onDownloadPdf?: () => Promise<void>;
 }
 
 // Page component that react-pageflip requires
@@ -51,7 +53,7 @@ const CoverPage = forwardRef<
 ));
 CoverPage.displayName = 'CoverPage';
 
-export default function FlipBook({ pdfData, containerRef }: FlipBookProps) {
+export default function FlipBook({ pdfData, containerRef, onExport: _onExport, onDownloadPdf }: FlipBookProps) {
   const { settings } = useBookSettings();
   const { t } = useTranslation();
   const bookRef = useRef<any>(null);
@@ -260,7 +262,24 @@ export default function FlipBook({ pdfData, containerRef }: FlipBookProps) {
 
     if (b.shadow || b.type === 'shadow') {
       const intensity = b.shadowIntensity / 100;
-      s.boxShadow = `0 2px 8px rgba(26,23,20,${0.1 * intensity}), 0 12px 32px rgba(26,23,20,${0.15 * intensity}), 0 0 0 1px rgba(26,23,20,0.05)`;
+      // Parse shadowColor (supports hex like #1A1714 or rgba(...))
+      const parseColor = (c: string): string => {
+        const m = c.trim().match(/^#([0-9a-f]{6})$/i);
+        if (m && m[1]) {
+          const r = parseInt(m[1].substring(0, 2), 16);
+          const g = parseInt(m[1].substring(2, 4), 16);
+          const bl = parseInt(m[1].substring(4, 6), 16);
+          return `${r}, ${g}, ${bl}`;
+        }
+        const rgbaMatch = c.match(/rgba?\(([^)]+)\)/);
+        if (rgbaMatch && rgbaMatch[1]) {
+          const parts = rgbaMatch[1].split(',').slice(0, 3).map((p) => p.trim());
+          return parts.join(', ');
+        }
+        return '26, 23, 20';
+      };
+      const rgb = parseColor(b.shadowColor);
+      s.boxShadow = `0 4px 16px rgba(${rgb},${(0.35 * intensity).toFixed(3)}), 0 20px 48px rgba(${rgb},${(0.5 * intensity).toFixed(3)})`;
     }
 
     return s;
@@ -300,7 +319,6 @@ export default function FlipBook({ pdfData, containerRef }: FlipBookProps) {
         style={{
           ...bookStyle,
           transform: `scale(${zoom / 100})`,
-          overflow: 'hidden',
         }}
       >
         <HTMLFlipBook
@@ -397,6 +415,7 @@ export default function FlipBook({ pdfData, containerRef }: FlipBookProps) {
         onToggleThumbnails={() => setShowThumbnails((v) => !v)}
         onToggleToc={() => setShowToc((v) => !v)}
         onToggleMute={() => setIsMuted((v) => !v)}
+        onDownload={onDownloadPdf}
       />
     </div>
   );

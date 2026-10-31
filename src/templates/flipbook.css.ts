@@ -59,7 +59,22 @@ export function generateCSS(settings: BookSettings): string {
   let shadowStyles = '';
   if (settings.border.shadow || settings.border.type === 'shadow') {
     const i = settings.border.shadowIntensity / 100;
-    shadowStyles = `box-shadow: 0 2px 8px rgba(26,23,20,${0.1 * i}), 0 12px 32px rgba(26,23,20,${0.15 * i}), 0 0 0 1px rgba(26,23,20,0.05);`;
+    const parseColor = (c: string): string => {
+      const m = c.trim().match(/^#([0-9a-f]{6})$/i);
+      if (m && m[1]) {
+        const r = parseInt(m[1].substring(0, 2), 16);
+        const g = parseInt(m[1].substring(2, 4), 16);
+        const bl = parseInt(m[1].substring(4, 6), 16);
+        return `${r}, ${g}, ${bl}`;
+      }
+      const rgbaMatch = c.match(/rgba?\(([^)]+)\)/);
+      if (rgbaMatch && rgbaMatch[1]) {
+        return rgbaMatch[1].split(',').slice(0, 3).map((p) => p.trim()).join(', ');
+      }
+      return '26, 23, 20';
+    };
+    const rgb = parseColor(settings.border.shadowColor);
+    shadowStyles = `box-shadow: 0 4px 16px rgba(${rgb},${(0.35 * i).toFixed(3)}), 0 20px 48px rgba(${rgb},${(0.5 * i).toFixed(3)});`;
   }
 
   return `
@@ -89,13 +104,13 @@ body {
 
 .book-wrapper {
   ${borderStyles}
-  overflow: hidden;
   transition: transform 0.25s ease;
   transform-origin: center center;
   display: flex; align-items: center; justify-content: center;
   position: relative;
   ${settings.border.radius > 0 ? `border-radius: ${settings.border.radius}px;` : ''}
   ${getBindingCSS(settings.binding.type)}
+  ${shadowStyles}
 }
 
 ${getBindingExtraCSS(settings.binding.type)}

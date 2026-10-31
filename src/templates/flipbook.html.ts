@@ -14,13 +14,16 @@ const ICONS = {
   list: '<svg viewBox="0 0 24 24"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>',
   close: '<svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>',
   volume: '<svg viewBox="0 0 24 24"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/></svg>',
+  download: '<svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>',
 };
 
 export function generateHTML(
   settings: BookSettings,
   pages: PageData[],
   textData: PageTextData[],
-  pageFlipSource: string
+  pageFlipSource: string,
+  originalPdfBase64: string,
+  pdfFileName: string
 ): string {
   const dir = settings.direction;
   const lang = settings.language;
@@ -29,11 +32,12 @@ export function generateHTML(
   const flipSound = settings.sound.enabled ? generateFlipSound(settings.sound.type) : '';
 
   const css = generateCSS(settings);
-  const js = generateJS(settings, pages, textData, pageFlipSource, flipSound);
+  const js = generateJS(settings, pages, textData, pageFlipSource, flipSound, originalPdfBase64, pdfFileName);
+  const showDownloadButton = settings.exportOptions.downloadButton && originalPdfBase64.length > 0;
 
   const labels = lang === 'ar'
-    ? { goTo: 'انتقل إلى صفحة', prev: 'السابق', next: 'التالي', toc: 'الفهرس', thumbnails: 'المصغرات', mute: 'كتم الصوت' }
-    : { goTo: 'Go to page', prev: 'Previous', next: 'Next', toc: 'Contents', thumbnails: 'Thumbnails', mute: 'Mute' };
+    ? { goTo: 'انتقل إلى صفحة', prev: 'السابق', next: 'التالي', toc: 'الفهرس', thumbnails: 'المصغرات', mute: 'كتم الصوت', download: 'تحميل الملف' }
+    : { goTo: 'Go to page', prev: 'Previous', next: 'Next', toc: 'Contents', thumbnails: 'Thumbnails', mute: 'Mute', download: 'Download File' };
 
   const prevIcon = isRtl ? ICONS.chevronRight : ICONS.chevronLeft;
   const nextIcon = isRtl ? ICONS.chevronLeft : ICONS.chevronRight;
@@ -105,6 +109,7 @@ ${css}
     <button id="btn-zoom-in" class="icon-btn">${ICONS.zoomIn}</button>
     <div class="separator"></div>
     ${settings.sound.enabled ? `<button id="btn-mute" class="icon-btn" title="${labels.mute}">${ICONS.volume}</button>` : ''}
+    ${showDownloadButton ? `<button id="btn-download" class="icon-btn" title="${labels.download}">${ICONS.download}</button>` : ''}
     <button id="btn-fullscreen" class="icon-btn">${ICONS.maximize}</button>
   </div>
 </div>

@@ -77,4 +77,7 @@ export const DEFAULT_SETTINGS: BookSettings = {
     enabled: true,
     type: 'paper',
   },
+  exportOptions: {
+    downloadButton: true,
+  },
 };

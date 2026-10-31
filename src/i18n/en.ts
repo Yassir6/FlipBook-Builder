@@ -106,6 +106,13 @@ const en: Record<TranslationKey, string> = {
   preview: 'Preview',
   exportHtml: 'Export HTML',
   exporting: 'Exporting...',
+  download: 'Download',
+  downloadFile: 'Download File',
+  downloadPdf: 'Download as PDF',
+  exportOptions: 'Export Options',
+  showDownloadButton: 'Show download button',
+  downloadButtonHelp: 'Show a button to download the book as PDF in the exported file',
+  generatingPdf: 'Generating PDF...',
 
   previousPage: 'Previous Page',
   nextPage: 'Next Page',

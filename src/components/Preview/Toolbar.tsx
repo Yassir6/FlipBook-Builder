@@ -10,6 +10,7 @@ import {
   GalleryHorizontalEnd,
   Volume2,
   VolumeX,
+  Download,
 } from 'lucide-react';
 import { useTranslation } from '../../i18n';
 import { useBookSettings } from '../../hooks/useBookSettings';
@@ -34,6 +35,7 @@ interface ToolbarProps {
   onToggleThumbnails: () => void;
   onToggleToc: () => void;
   onToggleMute: () => void;
+  onDownload?: () => void | Promise<void>;
 }
 
 export default function Toolbar({
@@ -53,6 +55,7 @@ export default function Toolbar({
   onToggleThumbnails,
   onToggleToc,
   onToggleMute,
+  onDownload,
 }: ToolbarProps) {
   const { t, dir } = useTranslation();
   const { settings } = useBookSettings();
@@ -171,6 +174,16 @@ export default function Toolbar({
             title={isMuted ? t('soundOn') : t('soundOff')}
           >
             {isMuted ? <VolumeX size={18} /> : <Volume2 size={18} />}
+          </button>
+        )}
+
+        {onDownload && settings.exportOptions.downloadButton && (
+          <button
+            className={styles.iconBtn}
+            onClick={() => { void onDownload(); }}
+            title={t('downloadPdf')}
+          >
+            <Download size={18} />
           </button>
         )}
 
